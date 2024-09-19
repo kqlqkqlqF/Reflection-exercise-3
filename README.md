@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repo provides students with a foundation for their own projects associated with *Telling Stories with Data*. You do not need every aspect for every paper and you should delete aspects that you do not need.
+This repo provides a very brief overview for the number of marriage license generated from each civic centre from 2011 Jan to 2021 Dec.
 
 
 ## File Structure
