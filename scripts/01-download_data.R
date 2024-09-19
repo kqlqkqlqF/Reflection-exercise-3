@@ -10,32 +10,26 @@
 ---
   
 
-#### Workspace setup ####
+#### Load required libraries ####
 library(opendatatoronto)
-library(tidyverse)
 library(dplyr)
+library(readr)  # For write_csv
 
-#### Download data ####
-# Get the dataset ID or package ID for "Marriage Licence Statistics"
-# The dataset package URL is: https://open.toronto.ca/dataset/marriage-licence-statistics/
-# Use the package ID directly:
-package_id <- "f7bf89d0-647e-4706-b7a7-5a8c3a2674e6"
 
-# Get all resources for the package
-resources <- list_package_resources(package_id)
+# get package
+package <- show_package("e28bc818-43d5-43f7-b5d9-bdfb4eda5feb")
+package
 
-# Find the correct resource (assuming it's a CSV file)
-marriage_licence_resource <- filter(resources, tolower(format) == "csv")
+# get all resources for this package
+resources <- list_package_resources("e28bc818-43d5-43f7-b5d9-bdfb4eda5feb")
 
-# Load the data from the selected resource
-marriage_licence_data <- marriage_licence_resource %>%
-  get_resource()
+# identify datastore resources; by default, Toronto Open Data sets datastore resource format to CSV for non-geospatial and GeoJSON for geospatial resources
+datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'))
 
-# View the first few rows of the dataset
-head(marriage_licence_data)
-
+# load the first datastore resource as a sample
+data <- filter(datastore_resources, row_number()==1) %>% get_resource()
+data
 #### Save data ####
-# change the_raw_data to whatever name you assigned when you downloaded it.
-write_csv(marriage_licence_data, "../data/raw_data/raw_marriage_data.csv") 
+# Save the data in the desired format
+write_csv(data, "../data/raw_data/raw_marriage_data.csv") 
 
-         

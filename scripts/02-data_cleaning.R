@@ -1,44 +1,31 @@
-#### Preamble ####
-# Purpose: Cleans the raw plane data recorded by two observers..... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 6 April 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+---
+  #### Preamble ####
+# Purpose:tclean up the dataset got from opendatatoronto for number of Marriage License
+# Author: Yiyi Feng
+# Date: 19th September 2024
+# Contact: yiyi.feng@mail.utoronto.ca
+# Pre-requisites: no pre-requisites 
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
-
-#### Workspace setup ####
-library(tidyverse)
+# Other information: Need to install packages"tidyverse" and "testthat".
+---
+  
+#### Load required libraries ####
+library(dplyr)
+library(tidyr)
+library(lubridate)
 
 #### Clean data ####
-raw_data <- read_csv("inputs/data/plane_data.csv")
+raw_data <- read_csv("../data/simulated_data/simulated_marriage_data.csv")
 
-cleaned_data <-
-  raw_data |>
-  janitor::clean_names() |>
-  select(wing_width_mm, wing_length_mm, flying_time_sec_first_timer) |>
-  filter(wing_width_mm != "caw") |>
-  mutate(
-    flying_time_sec_first_timer = if_else(flying_time_sec_first_timer == "1,35",
-                                   "1.35",
-                                   flying_time_sec_first_timer)
-  ) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "490",
-                                 "49",
-                                 wing_width_mm)) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "6",
-                                 "60",
-                                 wing_width_mm)) |>
-  mutate(
-    wing_width_mm = as.numeric(wing_width_mm),
-    wing_length_mm = as.numeric(wing_length_mm),
-    flying_time_sec_first_timer = as.numeric(flying_time_sec_first_timer)
-  ) |>
-  rename(flying_time = flying_time_sec_first_timer,
-         width = wing_width_mm,
-         length = wing_length_mm
-         ) |> 
-  tidyr::drop_na()
+#### Clean the data ####
+cleaned_data <- raw_data %>%
+  # Separate TIME_PERIOD into year and month
+  separate(TIME_PERIOD, into = c("year", "month"), sep = "-") %>%
+  # Create a date column from year and month using lubridate::ymd
+  mutate(date = ymd(paste(year, month, "01", sep = "-"))) %>%
+  # Select and reorder columns
+  select(id, CIVIC_CENTRE, MARRIAGE_LICENSES, date)
 
 #### Save data ####
-write_csv(cleaned_data, "outputs/data/analysis_data.csv")
+write_csv(cleaned_data, "../data/analysis_data/analysis_marriage_data.csv")
+
